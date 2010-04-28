@@ -43,6 +43,7 @@ class PollingSchedulerTest < Test::Unit::TestCase
     @scheduler.stubs(:build_request_checking_interval).returns(0)
     Time.expects(:now).times(4).returns(Time.at(0), Time.at(0), Time.at(1), Time.at(2))
     @mock_project.expects(:build_if_requested).times(2)
+    @mock_project.stubs(:poll_requested?).returns(false)
 
     @scheduler.check_build_request_until_next_polling
   end
@@ -62,6 +63,7 @@ class PollingSchedulerTest < Test::Unit::TestCase
     
     @mock_project.expects(:build_if_requested).times(0)
     @mock_project.expects(:force_build).times(1)
+    @mock_project.stubs(:poll_requested?).returns(false)
 
     @scheduler.always_build = true
     @scheduler.check_build_request_until_next_polling

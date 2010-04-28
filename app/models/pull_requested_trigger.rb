@@ -1,6 +1,6 @@
 require 'fileutils'
 
-class PostedBuildTrigger
+class PullRequestedTrigger
   
   def initialize(triggered_project, opts={})
     @triggered_project = triggered_project

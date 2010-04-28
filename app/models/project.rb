@@ -95,7 +95,7 @@ class Project
     @settings = ''
     @config_file_content = ''
     @error_message = ''
-    @triggers = [ChangeInSourceControlTrigger.new(self), PostedBuildTrigger.new(self)]
+    @triggers = [ChangeInSourceControlTrigger.new(self), PullRequestedTrigger.new(self)]
     self.source_control = scm if scm
     instantiate_plugins
   end

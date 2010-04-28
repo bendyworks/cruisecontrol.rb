@@ -641,7 +641,7 @@ class ProjectTest < ActiveSupport::TestCase
   def test_new_project_should_have_source_control_triggers
     project = Project.new('foo')
     trigger_classes = project.triggered_by.map(&:class)
-    assert_equal [ChangeInSourceControlTrigger], trigger_classes
+    assert_equal [ChangeInSourceControlTrigger, PullRequestedTrigger], trigger_classes
   end
 
 
