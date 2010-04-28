@@ -1,4 +1,6 @@
 class ProjectsController < ApplicationController
+
+  skip_before_filter :verify_authenticity_token, :only => :request_pull
   
   verify :params => "id", :only => [:show, :build, :code],
          :render => { :text => "Project not specified",
@@ -25,6 +27,14 @@ class ProjectsController < ApplicationController
       format.html { redirect_to :controller => "builds", :action => "show", :project => @project }
       format.rss { render :action => 'show_rss', :layout => false }
     end
+  end
+
+  def request_pull
+    @project = Project.find(params[:id])
+    File.open(@project.poll_requested_flag_file, 'w') do |f|
+      f.puts Time.now.to_s
+    end
+    render :text => 'ok'
   end
 
   def build

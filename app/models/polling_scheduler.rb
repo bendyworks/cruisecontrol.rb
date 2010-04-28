@@ -24,8 +24,8 @@ class PollingScheduler
   end
   
   def check_build_request_until_next_polling
-    time_to_go = Time.now + polling_interval
-    while Time.now < time_to_go
+    next_poll_time = Time.now + polling_interval
+    while !poll_required?(next_poll_time)
       if @always_build
         @project.force_build("Forcing build because project has 'always_build' flag set.")
       else
@@ -33,6 +33,10 @@ class PollingScheduler
       end
       sleep build_request_checking_interval
     end
+  end
+
+  def poll_required?(next_poll_time)
+    Time.now >= next_poll_time || @project.poll_requested?
   end
 
   def polling_interval

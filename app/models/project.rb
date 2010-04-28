@@ -95,7 +95,7 @@ class Project
     @settings = ''
     @config_file_content = ''
     @error_message = ''
-    @triggers = [ChangeInSourceControlTrigger.new(self)]
+    @triggers = [ChangeInSourceControlTrigger.new(self), PostedBuildTrigger.new(self)]
     self.source_control = scm if scm
     instantiate_plugins
   end
@@ -263,6 +263,16 @@ class Project
     result = builds.reverse[0..(n-1)]
   end
 
+  def request_poll_if_match(paths)
+    pattern = Regexp.new(Regexp.escape(@source_control.path(self)))
+    paths.each do |path|
+      if pattern.match path
+        create_poll_requested_flag_file
+        return
+      end
+    end
+  end
+
   def build_if_necessary
     begin
       if build_necessary?(reasons = [])
@@ -294,6 +304,10 @@ class Project
   
   def build_requested?
     File.file?(build_requested_flag_file)
+  end
+
+  def poll_requested?
+    File.file?(poll_requested_flag_file)
   end
   
   def request_build
@@ -428,6 +442,10 @@ class Project
     File.open(File.join(artifacts_directory, 'changeset.log'), 'w') do |f|
       reasons.each { |reason| f << reason.to_s << "\n" }
     end
+  end
+
+  def poll_requested_flag_file
+    File.join(path, 'poll_requested')
   end
 
   def build_requested_flag_file
